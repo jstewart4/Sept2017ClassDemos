@@ -31,6 +31,19 @@ namespace ChinookSystem.BLL
                 return results.ToList();
             }
 
+        }// end of method
+
+        [DataObjectMethod(DataObjectMethodType.Select,false)]
+        public List<Album> Albums_FindByYearRange(int minYear, int maxYear)
+        {
+            using (var context = new ChinookContext())
+            {
+                var results = from date in context.Albums
+                              where date.ReleaseYear >= minYear && date.ReleaseYear <= maxYear
+                              orderby date.ReleaseYear, date.Title
+                              select date;
+                return results.ToList();
+            }
         }
     }
 }
