@@ -28,6 +28,6 @@ namespace Chinook.Data.Entities
         //navigation properties
         //to a parent
         public virtual Artist Artist { get; set; }
-
+        public virtual ICollection<Track> Tracks { get; set }
     }
 }
