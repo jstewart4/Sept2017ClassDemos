@@ -12,9 +12,9 @@
         <div class="col-md-12">
             <!-- Nav tabs -->
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#search" data-toggle="tab">Lookup</a></li>
+                <li><a href="#search" data-toggle="tab">Lookup</a></li>
                 <li><a href="#crud" data-toggle="tab">Add Update Delete</a></li>
-                <li><a href="#listviewcrud" data-toggle="tab">ListView Crud</a></li>
+                <li class="active"><a href="#listviewcrud" data-toggle="tab">ListView Crud</a></li>
             </ul>
             <!-- tab content area -->
             <div class="tab-content">
@@ -126,7 +126,7 @@
 
                 </div> <%--eop--%>
                 <!-- unregistered user tab -->
-                <div class="tab-pane fade active" id="listviewcrud">
+                <div class="tab-pane fade in active" id="listviewcrud">
                     <asp:UpdatePanel ID="UpdatePanel3" runat="server">
                         <ContentTemplate>
                             <asp:ListView ID="ListViewCRUD" runat="server" DataSourceID="ListViewODS" InsertItemPosition="LastItem" DataKeyNames="AlbumID">
@@ -226,10 +226,10 @@
                                                 <table runat="server" id="itemPlaceholderContainer" style="background-color: #FFFFFF; border-collapse: collapse; border-color: #999999; border-style: none; border-width: 1px; font-family: Verdana, Arial, Helvetica, sans-serif;" border="1">
                                                     <tr runat="server" style="background-color: #DCDCDC; color: #000000;">
                                                         <th runat="server"></th>
-                                                        <th runat="server">AlbumId</th>
+                                                        <th runat="server">Id</th>
                                                         <th runat="server">Title</th>
                                                         <th runat="server">ArtistId</th>
-                                                        <th runat="server">ReleaseYear</th>
+                                                        <th runat="server">Rel.Year</th>
                                                         <th runat="server">ReleaseLabel</th>
                                                     </tr>
                                                     <tr runat="server" id="itemPlaceholder"></tr>
