@@ -24,7 +24,7 @@ public partial class SamplePages_TabbedCRUDReview : System.Web.UI.Page
             else
             {
                 // now that you are logged on, are you in the approved role for this page?
-                if (!User.IsInRole(SecurityRoles.Staff))
+                if (!User.IsInRole(SecurityRoles.Staff) && !User.IsInRole(SecurityRoles.WebsiteAdmins))
                 {
                     Response.Redirect("~/Account/Login.aspx");
                 }
