@@ -84,27 +84,45 @@ public partial class SamplePages_ManagePlaylist : System.Web.UI.Page
         }
         else
         {
+            // obtain the username from the security part of the application
+            string username = User.Identity.Name;
             // You do not have to do try/catch. The MessageUserControl has the try/catch coding embedded in the control
             MessageUserControl.TryRun(() =>
             {
                 // this is the process coding block to be executed under the "watchful eye" of the MessageUser control
-
-                // obtain the username from the security part of the application
-                string username = User.Identity.Name;
                 PlaylistTracksController sysmgr = new PlaylistTracksController();
                 List<UserPlaylistTrack> playlist = sysmgr.List_TracksForPlaylist(PlaylistName.Text, username);
                 PlayList.DataSource = playlist;
                 PlayList.DataBind();
-            });
+            },"","Here is your current playlist.");
         }
     }
 
-    protected void TracksSelectionList_ItemCommand(object sender, 
-        ListViewCommandEventArgs e)
+    protected void TracksSelectionList_ItemCommand(object sender, ListViewCommandEventArgs e)
     {
-        //code to go here
-    }
+        //ListViewCommandEventArgs parameter e contains the CommandArg value
+        if (string.IsNullOrEmpty(PlaylistName.Text))
+        {
+            MessageUserControl.ShowInfo("Warning", "Playlist name is required.");
+        }
+        else
+        {
+            string username = User.Identity.Name;
 
+            // TrackID is going to come from e.CommandArgument
+            // e.CommandArgument is an object, therefore you MUST convert to string
+            int trackid = int.Parse(e.CommandArgument.ToString());
+
+            // the following code calls a BLL method to add to the database
+            MessageUserControl.TryRun(() =>
+           {
+               PlaylistTracksController sysmgr = new PlaylistTracksController();
+               List<UserPlaylistTrack> refreshresults = sysmgr.Add_TrackToPLaylist(PlaylistName.Text, username, trackid);
+               PlayList.DataSource = refreshresults;
+               PlayList.DataBind();
+           }, "Success", "Track added to playlist");
+        }
+    }
     protected void MoveUp_Click(object sender, EventArgs e)
     {
         //code to go here
