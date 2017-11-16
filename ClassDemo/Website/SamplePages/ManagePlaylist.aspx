@@ -137,7 +137,7 @@
                         </td>
                     </tr>
                     <tr runat="server">
-                        <td runat="server" style="text-align: center; background-color: #5D7B9D; font-family: Verdana, Arial, Helvetica, sans-serif; color: #FFFFFF">
+                        <td runat="server" style="text-align: center; background-color: #cee5ff; font-family: Verdana, Arial, Helvetica, sans-serif; color: #000000">
                             <asp:DataPager runat="server" ID="DataPager1" PageSize="5" PagedControlID="TracksSelectionList">
                                 <Fields>
                                     <asp:NextPreviousPagerField ButtonType="Button" ShowFirstPageButton="True" ShowNextPageButton="False" ShowPreviousPageButton="False"></asp:NextPreviousPagerField>

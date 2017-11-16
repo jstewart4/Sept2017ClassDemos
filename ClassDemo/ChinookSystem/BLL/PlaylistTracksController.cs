@@ -100,7 +100,85 @@ namespace ChinookSystem.BLL
         {
             using (var context = new ChinookContext())
             {
-                //code to go here 
+                // query to get the playlist id
+                var exists = (from x in context.Playlists
+                              where x.UserName.Equals(username) && x.Name.Equals(playlistname)
+                              select x).FirstOrDefault();
+                if (exists == null)
+                {
+                    throw new Exception("Playlist has been removed");
+                }
+                else
+                {
+                    // limit your search to the particular playlist (using exists not context)
+                    PlaylistTrack movetrack = (from x in exists.PlaylistTracks
+                                               where x.TrackId == trackid
+                                               select x).FirstOrDefault();
+                    if (movetrack == null)
+                    {
+                        throw new Exception("Playlist track has been removed");
+                    }
+                    else
+                    {
+                        PlaylistTrack othertrack = null;
+                        if (direction.Equals("up")) // for up button
+                        {
+                            if (movetrack.TrackNumber == 1)
+                            {
+                                throw new Exception("Playlist track cannot be moved up.");
+                            }
+                            else
+                            {
+                                // get the other track
+                                othertrack = (from x in exists.PlaylistTracks
+                                              where x.TrackNumber == movetrack.TrackNumber - 1
+                                              select x).FirstOrDefault();
+
+                                if (othertrack == null)
+                                {
+                                    throw new Exception("Playlist track cannot be moved up.");
+                                }
+                                else
+                                {
+                                    // at this point you can exchange track numbers
+                                    movetrack.TrackNumber -= 1;
+                                    othertrack.TrackNumber += 1;
+                                }
+                            }
+                        }
+                        else // for down button
+                        {
+                            if (movetrack.TrackNumber == exists.PlaylistTracks.Count)
+                            {
+                                throw new Exception("Playlist track cannot be moved down.");
+                            }
+                            else
+                            {
+                                // get the other track
+                                othertrack = (from x in exists.PlaylistTracks
+                                              where x.TrackNumber == movetrack.TrackNumber + 1
+                                              select x).FirstOrDefault();
+
+                                if (othertrack == null)
+                                {
+                                    throw new Exception("Playlist track cannot be moved down.");
+                                }
+                                else
+                                {
+                                    // at this point you can exchange track numbers
+                                    movetrack.TrackNumber += 1;
+                                    othertrack.TrackNumber -= 1;
+                                }
+                            }
+                        }
+                        // stage the changes for SaveChanges()
+                        // indicate only the field that needs to be updated
+                        context.Entry(movetrack).Property(y => y.TrackNumber).IsModified = true;
+                        context.Entry(othertrack).Property(y => y.TrackNumber).IsModified = true;
+                        context.SaveChanges();
+
+                    }
+                }
 
             }
         }//eom
@@ -110,9 +188,6 @@ namespace ChinookSystem.BLL
         {
             using (var context = new ChinookContext())
             {
-               //code to go here
-
-
             }
         }//eom
     }

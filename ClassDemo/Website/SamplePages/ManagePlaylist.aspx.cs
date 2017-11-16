@@ -94,7 +94,7 @@ public partial class SamplePages_ManagePlaylist : System.Web.UI.Page
                 List<UserPlaylistTrack> playlist = sysmgr.List_TracksForPlaylist(PlaylistName.Text, username);
                 PlayList.DataSource = playlist;
                 PlayList.DataBind();
-            },"","Here is your current playlist.");
+            },"Information","Here is your current playlist.");
         }
     }
 
@@ -125,16 +125,136 @@ public partial class SamplePages_ManagePlaylist : System.Web.UI.Page
     }
     protected void MoveUp_Click(object sender, EventArgs e)
     {
-        //code to go here
+        // check if you have a list
+        if (PlayList.Rows.Count == 0)
+        {
+            MessageUserControl.ShowInfo("Warning", "No playlist has been retreived.");
+        }
+        else
+        {
+            // check if playlist name field is empty
+            if (string.IsNullOrEmpty(PlaylistName.Text))
+            {
+                MessageUserControl.ShowInfo("Warning", "No playlist name has been supplied.");
+            }
+            else
+            {
+                // check only one row selected
+                int trackid = 0;
+                int tracknumber = 0; // optional
+                int rowselected = 0; // search flag
+                // create a pointer to use for the access of the GridView control. Says "this is the checkbox in this row".
+                CheckBox playlistselection = null;
+                // traverse the GridView checking each row for a selected checkbox
+                for (int i = 0; i < PlayList.Rows.Count; i++)
+                {
+                    // find the checkbox on the indexed GridView row. playlistselection will point to the checkbox.
+                    playlistselection = PlayList.Rows[i].FindControl("Selected") as CheckBox;
+                    // check if it is checked
+                    if (playlistselection.Checked)
+                    {
+                        trackid = int.Parse((PlayList.Rows[i].FindControl("TrackId") as Label).Text);
+                        tracknumber = int.Parse((PlayList.Rows[i].FindControl("TrackNumber") as Label).Text);
+                        rowselected++;
+                    }
+                }
+                // check if only one track is selected
+                if (rowselected != 1)
+                {
+                    MessageUserControl.ShowInfo("Warning", "Select only one track to move.");
+                }
+                else
+                {
+                    // check if track is at the top of the playlist
+                    if (tracknumber == 1)
+                    {
+                        MessageUserControl.ShowInfo("Information", "Track can not be moved, it is already at top of the list.");
+                    }
+                    else
+                    {
+                        // at this point you have playlist name, username, and trackid which is needed to move the track
+
+                        // move the track via your BLL
+                        MoveTrack(trackid, tracknumber, "up");
+                    }
+                }
+            }
+        }
     }
 
     protected void MoveDown_Click(object sender, EventArgs e)
     {
-        //code to go here
+        // check if you have a list
+        if (PlayList.Rows.Count == 0)
+        {
+            MessageUserControl.ShowInfo("Warning", "No playlist has been retreived.");
+        }
+        else
+        {
+            // check if playlist name field is empty
+            if (string.IsNullOrEmpty(PlaylistName.Text))
+            {
+                MessageUserControl.ShowInfo("Warning", "No playlist name has been supplied.");
+            }
+            else
+            {
+                // check only one row selected
+                int trackid = 0;
+                int tracknumber = 0; // optional
+                int rowselected = 0; // search flag
+                // create a pointer to use for the access of the GridView control. Says "this is the checkbox in this row".
+                CheckBox playlistselection = null;
+                // traverse the GridView checking each row for a selected checkbox
+                for (int i = 0; i < PlayList.Rows.Count; i++)
+                {
+                    // find the checkbox on the indexed GridView row. playlistselection will point to the checkbox.
+                    playlistselection = PlayList.Rows[i].FindControl("Selected") as CheckBox;
+                    // check if it is checked
+                    if (playlistselection.Checked)
+                    {
+                        trackid = int.Parse((PlayList.Rows[i].FindControl("TrackId") as Label).Text);
+                        tracknumber = int.Parse((PlayList.Rows[i].FindControl("TrackNumber") as Label).Text);
+                        rowselected++;
+                    }
+                }
+                // check if only one track is selected
+                if (rowselected != 1)
+                {
+                    MessageUserControl.ShowInfo("Warning", "Select only one track to move.");
+                }
+                else
+                {
+                    // check if track is at the top of the playlist
+                    if (tracknumber == PlayList.Rows.Count)
+                    {
+                        MessageUserControl.ShowInfo("Information", "Track can not be moved, it is already at bottom of the list.");
+                    }
+                    else
+                    {
+                        // at this point you have playlist name, username, and trackid which is needed to move the track
+
+                        // move the track via your BLL
+                        MoveTrack(trackid, tracknumber, "down");
+                    }
+                }
+            }
+        }
     }
     protected void MoveTrack(int trackid, int tracknumber, string direction)
     {
-        //code to go here
+        // Wrap in MessageUserControl tryrun (try catch) for error handling
+        MessageUserControl.TryRun(() =>
+        {
+            // standard call to a BLL method
+            // update call
+            PlaylistTracksController sysmgr = new PlaylistTracksController();
+            sysmgr.MoveTrack(User.Identity.Name, PlaylistName.Text, trackid, tracknumber, direction);
+            // after you move, refresh the list
+            // query call
+            List<UserPlaylistTrack> results = sysmgr.List_TracksForPlaylist(PlaylistName.Text, User.Identity.Name);
+            PlayList.DataSource = results;
+            PlayList.DataBind();
+        },"Success", "Track moved.");
     }
     protected void DeleteTrack_Click(object sender, EventArgs e)
     {

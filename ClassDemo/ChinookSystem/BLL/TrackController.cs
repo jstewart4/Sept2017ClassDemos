@@ -103,6 +103,26 @@ namespace ChinookSystem.BLL
                                        }).ToList();
                             break;
                         }
+                        // Another way of doing it (shorter):
+
+                        //results = (from x in context.Tracks
+                        //           orderby x.Name
+                        //           where tracksby.Equals("Artist") ? x.Album.ArtistId == argid :
+                        //            tracksby.Equals("MediaType") ? x.MediaTypeId == argid :
+                        //            tracksby.Equals("Genre") ? x.GenreId == argid : 
+                        //            x.AlbumId == argid
+                        //           select new TrackList
+                        //           {
+                        //               TrackID = x.TrackId,
+                        //               Name = x.Name,
+                        //               Title = x.Album.Title,
+                        //               MediaName = x.MediaType.Name,
+                        //               GenreName = x.Genre.Name,
+                        //               Composer = x.Composer,
+                        //               Milliseconds = x.Milliseconds,
+                        //               Bytes = x.Bytes,
+                        //               UnitPrice = x.UnitPrice
+                        //           }).ToList();
                 }
 
                 // if using IEnumerable<TrackList> results = null; you must put results.ToList();
@@ -110,6 +130,24 @@ namespace ChinookSystem.BLL
             }
         }//eom
 
+        [DataObjectMethod(DataObjectMethodType.Select,false)]
+        public List<GenreAlbumReport> GenreAlbumReport_Get()
+        {
+            using (var context = new ChinookContext())
+            {
+                var results = from x in context.Tracks
+                              select new GenreAlbumReport
+                              {
+                                  GenreName = x.Genre.Name,
+                                  AlbumTitle = x.Album.Title,
+                                  TrackName = x.Name,
+                                  Milliseconds = x.Milliseconds,
+                                  Bytes = x.Bytes,
+                                  UnitPrice = x.UnitPrice
+                              };
+                return results.ToList();
+            }
+        }
        
     }//eoc
 }
