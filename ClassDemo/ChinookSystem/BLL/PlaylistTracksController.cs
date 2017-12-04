@@ -184,10 +184,44 @@ namespace ChinookSystem.BLL
         }//eom
 
 
-        public void DeleteTracks(string username, string playlistname, List<int> trackstodelete)
+        public List<UserPlaylistTrack> DeleteTracks(string username, string playlistname, List<int> trackstodelete)
         {
             using (var context = new ChinookContext())
             {
+                // , StringComparison.OrdinalIgnoreCase means to check if there are uppercase (not always required)
+                Playlist exists = (from x in context.Playlists
+                                   where x.UserName.Equals(username, StringComparison.OrdinalIgnoreCase) && x.Name.Equals(playlistname, StringComparison.OrdinalIgnoreCase)
+                                   select x).FirstOrDefault();
+                if (exists == null)
+                {
+                    throw new Exception("Playlist has been removed from our site.");
+                }
+                else
+                {
+                    // the tracks that are to be kept
+                    var trackskept = exists.PlaylistTracks.Where(tr => !trackstodelete.Any(tod => tod == tr.TrackId)).Select(tr => tr);
+                    // remove the tracks in the tackstodelete list
+                    PlaylistTrack item = null;
+                    foreach(var deletetrack in trackstodelete)
+                    {
+                        item = exists.PlaylistTracks.Where(dx => dx.TrackId == deletetrack).FirstOrDefault();
+                        if (item != null)
+                        {
+                            exists.PlaylistTracks.Remove(item);
+                        }
+                    }
+                    // renumber the kept tracks so that the tracknumber is squential, as is expected by all other operations.
+                    // in our database, there is NO holes in the numeric sequence (playlist trackid)
+                    int number = 1;
+                    foreach (var trackkept in trackskept)
+                    {
+                        trackkept.TrackNumber = number;
+                        context.Entry(trackkept).Property(y => y.TrackNumber).IsModified = true; // just updating the field, not the entire entity
+                        number++;
+                    }
+                    context.SaveChanges();
+                    return List_TracksForPlaylist(playlistname, username);
+                }
             }
         }//eom
     }
